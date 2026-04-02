@@ -1,0 +1,28 @@
+# dpkg 
+Package: dpkg
+Package: dpkg-dev
+Package: libdpkg-perl
+# fonts
+Package: fonts-croscore
+Package: fonts-freefont-otf
+Package: fonts-freefont-ttf
+Package: fonts-liberation
+Package: fonts-noto-core
+Package: fonts-texgyre
+# blas conflict
+Package: libopenblas0-pthread
+Package: libopenblas-pthread-dev
+Package: libatlas3-base
+Package: libatlas-base-dev
+Package: libopenblas0-openmp
+Package: libopenblas-openmp-dev
+Package: libopenblas0-serial
+Package: libopenblas-serial-dev
+Package: libopenblas-dev
+# graphicsmagick conflict
+Package: graphicsmagick-libmagick-dev-compat
+Package: libgraphicsmagick++1-dev
+Package: libgraphicsmagick1-dev
+Package: libgraphicsmagick++-q16-12
+Package: libgraphicsmagick-q16-3
+Package: libgraphics-magick-perl

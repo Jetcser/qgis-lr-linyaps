@@ -3,8 +3,8 @@
 /linglong
 /logs
 /qgis-src
-/*.list
 /*.tar.gz
 /*.sh
 /*.bak
 /*.zip
+/base*.list
