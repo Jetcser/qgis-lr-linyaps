@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export INSTALL_ROOT="/opt/apps/${LINGLONG_APPID}/files"
+source ${INSTALL_ROOT}/bin/env_vars.sh

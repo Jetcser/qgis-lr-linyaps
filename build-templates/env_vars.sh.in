@@ -1,0 +1,92 @@
+#!/bin/bash
+# 通过 source env_vars.sh 调用
+
+# 基础路径定义 (确保变量已在外部定义，否则给定默认值)
+INSTALL_ROOT="/opt/apps/${LINGLONG_APPID}/files"
+TRIPLET=$(cat "/etc/linglong-triplet-list" | xargs)
+GRASS_VER="84"
+PY_VER="3.12"
+QT_VER="6"
+
+# 去除qt警告，防止UOS20中的程序崩溃
+export QT_LOGGING_RULES="*.warning=false"
+
+# 去除numpy的最小次正规数警告
+export PYTHONWARNINGS="ignore:The value of the smallest subnormal:UserWarning"
+
+# 使用EGL渲染后端，解决玲珑沙箱中的DRM报错
+export QT_XCB_GL_INTEGRATION=xcb_egl
+
+export GISBASE="${INSTALL_ROOT}/grass84"
+export PROJ_LIB="${INSTALL_ROOT}/share/proj"
+export GDAL_DATA="${INSTALL_ROOT}/share/gdal"
+
+export QT_PLUGIN_PATH="\
+${INSTALL_ROOT}/lib/${TRIPLET}/qt6/plugins:\
+${INSTALL_ROOT}/lib/${TRIPLET}/qca-qt6:\
+/runtime/lib/${TRIPLET}/qt6/plugins:\
+${QT_PLUGIN_PATH:-}"
+
+export QML2_IMPORT_PATH="$INSTALL_ROOT/qml:${QML2_IMPORT_PATH:-}"
+
+# webengine process path and resources path
+export QTWEBENGINEPROCESS_PATH="/runtime/lib/qt6/libexec/QtWebEngineProcess"
+export QTWEBENGINE_RESOURCES_PATH="/runtime/share/qt6/resources"
+export QTWEBENGINE_LOCALES_PATH="/runtime/share/qt6/translations/qtwebengine_locales"
+
+# --- 2. 运行时动态库路径 (程序启动查找 .so) ---
+# 遍历INSTALL_ROOT/lib子目录
+SUB_LIBS=(
+    "${TRIPLET}"
+    "${TRIPLET}/lapack"
+    "${TRIPLET}/blas"
+    "${TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders"
+    "${TRIPLET}/graphviz"
+    "${TRIPLET}/odbc"
+    "${TRIPLET}/libmariadb3/plugin"
+    "${TRIPLET}/hdf5/serial"
+    "${TRIPLET}/libheif/plugins"
+    "${TRIPLET}/mit-krb5"
+#    "${TRIPLET}/openblas-pthread"
+    "${TRIPLET}/qca-qt6/crypto"
+    "${TRIPLET}/qca-qt6/ogdi/4.1"
+)
+
+# 循环拼接路径，获取子目录路径
+EXT_LIB_PATHS=""
+for sub in "${SUB_LIBS[@]}"; do
+    EXT_LIB_PATHS="${INSTALL_ROOT}/lib/${sub}:${EXT_LIB_PATHS}"
+done
+
+# 构造变量
+export LD_LIBRARY_PATH="\
+$HOME/.local/lib/${TRIPLET}:\
+$HOME/.local/lib:\
+${EXT_LIB_PATHS}:\
+${INSTALL_ROOT}/grass${GRASS_VER}/lib:\
+${INSTALL_ROOT}/lib/${TRIPLET}:\
+${INSTALL_ROOT}/lib:\
+${INSTALL_ROOT}/qml/QgsQuick:\
+/runtime/lib/${TRIPLET}:\
+/runtime/lib:\
+/usr/lib/${TRIPLET}:\
+/usr/lib:\
+${LD_LIBRARY_PATH:-}"
+
+# --- 3. PYTHONPATH 路径---
+# 优先级：用户目录 > 自定义安装路径 > Runtime 路径 > 系统路径
+export PYTHONPATH="\
+$HOME/.local/lib/python${PY_VER}/dist-packages:\
+${INSTALL_ROOT}/lib/python3/dist-packages:\
+${INSTALL_ROOT}/share/qgis/python:\
+/runtime/lib/python3/dist-packages:\
+/usr/lib/python3/dist-packages:\
+${PYTHONPATH:-}"
+
+# --- 4. PATH 路径 ---
+export PATH="\
+$HOME/.local/bin:\
+${INSTALL_ROOT}/grass${GRASS_VER}/bin:\
+${INSTALL_ROOT}/grass${GRASS_VER}/scripts:\
+${INSTALL_ROOT}/bin:\
+${PATH:-}"

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# 禁用辅助功能与 GUI 后端
+export NO_AT_BRIDGE=1
+export GDK_BACKEND=headless
+
+# 无参数输出版本，有参数则透传
+if [ $# -eq 0 ]; then
+    exec "$0.bin" -V
+else
+    exec "$0.bin" "$@"
+fi

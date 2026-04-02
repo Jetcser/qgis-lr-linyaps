@@ -1,0 +1,78 @@
+void QgsApplication::installTranslators()
+{
+  // Remove translators if any are already installed
+  if ( mQgisTranslator )
+  {
+    removeTranslator( mQgisTranslator.get() );
+    mQgisTranslator.reset( );
+
+  }
+  if ( mQtTranslator )
+  {
+    removeTranslator( mQtTranslator.get() );
+    mQtTranslator.reset( );
+
+  }
+  if ( mQtBaseTranslator )
+  {
+    removeTranslator( mQtBaseTranslator.get() );
+    mQtBaseTranslator.reset( );
+
+  }
+
+
+  if ( *sTranslation() != "C"_L1 )
+  {
+    const QLocale loc( *sTranslation() );
+    QString qgisLocale = *sTranslation();
+    // Nomarlize Chinese locale tag to BCP-47 style, prevent matching failure.
+    if ( loc.language() == QLocale::Chinese )
+    {
+      qgisLocale = ( loc.script() == QLocale::TraditionalChineseScript ) ? u"zh-Hant"_s : u"zh-Hans"_s;
+      QgsDebugMsgLevel( u"qgis locale tag: %1 (original: %2)"_s
+                    .arg( qgisLocale, *sTranslation() ), 2 );
+    }
+
+    mQgisTranslator = std::make_unique<QTranslator>( this );
+    if ( mQgisTranslator->load( u"qgis_"_s + qgisLocale, i18nPath() ) )
+    {
+      installTranslator( mQgisTranslator.get() );
+    }
+    else
+    {
+      QgsDebugMsgLevel( u"loading of qgis translation failed %1/qgis_%2"_s.arg( i18nPath(), qgisLocale ), 2 );
+    }
+
+    /* Translation file for Qt.
+     * The strings from the QMenuBar context section are used by Qt/Mac to shift
+     * the About, Preferences and Quit items to the Mac Application menu.
+     * These items must be translated identically in both qt_ and qgis_ files.
+     */
+    QString qtTranslationsPath = QLibraryInfo::location( QLibraryInfo::TranslationsPath );
+#ifdef __MINGW32__
+    QString prefix = QDir( QString( "%1/../" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
+    qtTranslationsPath = prefix + qtTranslationsPath.mid( QLibraryInfo::location( QLibraryInfo::PrefixPath ).length() );
+#endif
+
+    // Load Qt translations using QLocale for best matching.
+    mQtTranslator = std::make_unique<QTranslator>( this );
+    if ( mQtTranslator->load( loc, u"qt"_s, u"_"_s, qtTranslationsPath ) )
+    {
+      installTranslator( mQtTranslator.get() );
+    }
+    else
+    {
+      QgsDebugMsgLevel( u"loading of qt translation failed %1/qt_%2"_s.arg( qtTranslationsPath, *sTranslation() ), 2 );
+    }
+
+    mQtBaseTranslator = std::make_unique<QTranslator>( this );
+    if ( mQtBaseTranslator->load( loc, u"qtbase"_s, u"_"_s, qtTranslationsPath ) )
+    {
+      installTranslator( mQtBaseTranslator.get() );
+    }
+    else
+    {
+      QgsDebugMsgLevel( u"loading of qtbase translation failed %1/qt_%2"_s.arg( qtTranslationsPath, *sTranslation() ), 2 );
+    }
+  }
+}
