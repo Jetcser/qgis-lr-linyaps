@@ -15,6 +15,13 @@ SOURCES="/project/linglong/sources"
 PDAL_TARBALL="$SOURCES/pdal-src.tar.bz2"
 PDAL_SRC_DIR="$SOURCES/pdal-src"
 
+# 处理/runtime目录下的ztsd库链接
+BASE_LIBDIR="/usr/lib/${TRIPLET}"
+RUNTIME_LIBDIR="/runtime/lib/${TRIPLET}"
+libzstd_VER=$(ls ${BASE_LIBDIR}/libzstd.so.* 2>/dev/null | grep -oP '\d+\.\d+(\.\d+)?' | sort -V | tail -n 1)
+ln -sf "${BASE_LIBDIR}/libzstd.so.1" \
+    "${RUNTIME_LIBDIR}/libzstd.so.${libzstd_VER}"
+
 echo "===== 开始构建 PDAL ====="
 
 echo "解压源码包..."

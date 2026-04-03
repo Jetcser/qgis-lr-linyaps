@@ -2,7 +2,8 @@
 /ccache_storage
 /linglong
 /logs
-/qgis-src
+/qgis*
+/*.tar.bz2
 /*.tar.gz
 /*.sh
 /*.bak

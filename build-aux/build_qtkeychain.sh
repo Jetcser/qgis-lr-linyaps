@@ -8,8 +8,9 @@ SOURCES="/project/linglong/sources"
 SOURCE_DIR="${SOURCES}/qtkeychain-dsc"
 TEMPL_DIR="/project/build-templates"
 
-# 0.12版本QtKeychainConfig.cmake.in在Qt6下行为不正常，使用0.15版本代替
-cp -a ${TEMPL_DIR}/QtKeychainConfig.cmake.in ${SOURCE_DIR}/QtKeychainConfig.cmake.in
+# 0.12版本QtKeychainConfig.cmake.in在Qt6下行为不正常，使用模板目录中的0.15版本代替
+rm -f ${SOURCE_DIR}/QtKeychainConfig.cmake.in
+cp ${TEMPL_DIR}/QtKeychainConfig.cmake.in ${SOURCE_DIR}/QtKeychainConfig.cmake.in
 
 # --- 进入源码目录 ---
 cd "${SOURCE_DIR}"
