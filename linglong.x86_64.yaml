@@ -3,7 +3,7 @@ version: "1"
 package:
   id: org.qgis.qgis
   name: org.qgis.qgis
-  version: 4.0.0.1
+  version: 4.0.1.0
   kind: app
   description: |
     QGIS latest release.
